@@ -159,7 +159,7 @@ const Login = () => {
                                 autoComplete="current-password"
                                 className={classes.inputField}
                             />
-                            <Grid container justify="flex-end">
+                            <Grid container justifyContent="flex-end">
                                 <Grid item xs={6} style={{ textAlign: "right" }}>
                                     <Link
                                         component={RouterLink}
