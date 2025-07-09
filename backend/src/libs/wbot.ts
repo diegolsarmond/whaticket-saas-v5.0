@@ -2,16 +2,14 @@ import * as Sentry from "@sentry/node";
 import makeWASocket, {
   WASocket,
   Browsers,
-  WAMessage,
   DisconnectReason,
   fetchLatestBaileysVersion,
   makeCacheableSignalKeyStore,
+  makeInMemoryStore,
   isJidBroadcast,
-  WAMessageKey,
   jidNormalizedUser,
   CacheStore
 } from "@whiskeysockets/baileys";
-import makeInMemoryStore, { useMultiFileAuthState } from "@whiskeysockets/baileys";
 import { Op } from "sequelize";
 import { FindOptions } from "sequelize/types";
 import Whatsapp from "../models/Whatsapp";
@@ -30,51 +28,10 @@ import Ticket from "../models/Ticket";
 const loggerBaileys = MAIN_LOGGER.child({});
 loggerBaileys.level = "error";
 
-const msgRetryCounterCache = new NodeCache({
-  stdTTL: 600,
-  maxKeys: 1000,
-  checkperiod: 300,
-  useClones: false
-});
-
-const msgCache = new NodeCache({
-  stdTTL: 60,
-  maxKeys: 1000,
-  checkperiod: 300,
-  useClones: false
-});
-
 type Session = WASocket & {
   id?: number;
   store?: Store;
 };
-
-export default function msg() {
-  return {
-    get: (key: WAMessageKey) => {
-      const { id } = key;
-      if (!id) return;
-      let data = msgCache.get(id);
-      if (data) {
-        try {
-          let msg = JSON.parse(data as string);
-          return msg?.message;
-        } catch (error) {
-          logger.error(error);
-        }
-      }
-    },
-    save: (msg: WAMessage) => {
-      const { id } = msg.key;
-      const msgtxt = JSON.stringify(msg);
-      try {
-        msgCache.set(id as string, msgtxt);
-      } catch (error) {
-        logger.error(error);
-      }
-    }
-  }
-}
 
 const sessions: Session[] = [];
 
@@ -135,8 +92,6 @@ export const restartWbot = async (
   }
 };
 
-export const msgDB = msg();
-
 export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -166,27 +121,26 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
 
         const { state, saveState } = await authState(whatsapp);
 
-        //const msgRetryCounterCache = new NodeCache();
+        const msgRetryCounterCache = new NodeCache();
         const userDevicesCache: CacheStore = new NodeCache();
 
         wsocket = makeWASocket({
           logger: loggerBaileys,
           printQRInTerminal: false,
+          browser: [
+            process.env.BROWSER_CLIENT || "PackTypebot",
+            process.env.BROWSER_NAME || "Chrome",
+            process.env.BROWSER_VERSION || "10.0"
+          ],
           auth: {
             creds: state.creds,
             keys: makeCacheableSignalKeyStore(state.keys, logger),
           },
           version,
-		  browser: Browsers.appropriate("Desktop"),
-          defaultQueryTimeoutMs: undefined,
+          // defaultQueryTimeoutMs: 60000,
+          // retryRequestDelayMs: 250,
+          // keepAliveIntervalMs: 1000 * 60 * 10 * 3,
           msgRetryCounterCache,
-		  markOnlineOnConnect: false,
-		  connectTimeoutMs: 25_000,
-		  retryRequestDelayMs: 500,
-		  getMessage: msgDB.get,
-		  emitOwnEvents: true,
-          fireInitQueries: true,
-		  transactionOpts: { maxCommitRetries: 10, delayBetweenTriesMs: 3000 },
           shouldIgnoreJid: jid => isJidBroadcast(jid),
         });
 
@@ -236,7 +190,7 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
 
                 await DeleteBaileysService(whatsapp.id);
 
-                io.emit(`company-${whatsapp.companyId}-whatsappSession`, {
+                io.to(`company-${whatsapp.companyId}-mainchannel`).emit(`company-${whatsapp.companyId}-whatsappSession`, {
                   action: "update",
                   session: whatsapp
                 });
@@ -249,7 +203,7 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
                 await whatsapp.update({ status: "PENDING", session: "", number: "" });
                 await DeleteBaileysService(whatsapp.id);
 
-                io.emit(`company-${whatsapp.companyId}-whatsappSession`, {
+                io.to(`company-${whatsapp.companyId}-mainchannel`).emit(`company-${whatsapp.companyId}-whatsappSession`, {
                   action: "update",
                   session: whatsapp
                 });
@@ -269,10 +223,10 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
                     : "-"
               });
 
-                io.emit(`company-${whatsapp.companyId}-whatsappSession`, {
-                  action: "update",
-                  session: whatsapp
-                });
+              io.to(`company-${whatsapp.companyId}-mainchannel`).emit(`company-${whatsapp.companyId}-whatsappSession`, {
+                action: "update",
+                session: whatsapp
+              });
 
               const sessionIndex = sessions.findIndex(
                 s => s.id === whatsapp.id
@@ -293,7 +247,7 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
                 });
                 await DeleteBaileysService(whatsapp.id);
 
-                io.emit(`company-${whatsapp.companyId}-whatsappSession`, {
+                io.to(`company-${whatsapp.companyId}-mainchannel`).emit("whatsappSession", {
                   action: "update",
                   session: whatsapp
                 });
@@ -320,7 +274,7 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
                   sessions.push(wsocket);
                 }
 
-                io.emit(`company-${whatsapp.companyId}-whatsappSession`, {
+                io.to(`company-${whatsapp.companyId}-mainchannel`).emit(`company-${whatsapp.companyId}-whatsappSession`, {
                   action: "update",
                   session: whatsapp
                 });

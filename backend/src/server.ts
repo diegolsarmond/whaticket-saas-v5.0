@@ -27,22 +27,17 @@ const server = app.listen(process.env.PORT, async () => {
 });
 
 process.on("uncaughtException", err => {
-  console.error(`${new Date().toUTCString()} uncaughtException:`, err.message);
-  console.error(err.stack);
-  process.exit(1);
+  logger.error(`${new Date().toUTCString()} uncaughtException:`, err.message);
+  logger.error(err.stack);
+  // Remove process.exit(1); to avoid abrupt shutdowns
 });
 
 process.on("unhandledRejection", (reason, p) => {
-  console.error(
-    `${new Date().toUTCString()} unhandledRejection:`,
-    reason,
-    p
-  );
-  process.exit(1);
+  logger.error(`${new Date().toUTCString()} unhandledRejection:`, reason, p);
+  // Remove process.exit(1); to avoid abrupt shutdowns
 });
 
-
-cron.schedule("* * * * *", async () => {
+cron.schedule("* */5 * * *", async () => {
   try {
     logger.info(`Serviço de transferência de tickets iniciado`);
     await TransferTicketQueue();
