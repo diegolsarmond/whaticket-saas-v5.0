@@ -47,7 +47,11 @@ app.use(async (err: Error, req: Request, res: Response, _: NextFunction) => {
   }
 
   logger.error(err);
-  return res.status(500).json({ error: "Internal server error" });
+  const errorMessage =
+    process.env.NODE_ENV === "production" ?
+      "Internal server error" :
+      err.message;
+  return res.status(500).json({ error: errorMessage });
 });
 
 export default app;
