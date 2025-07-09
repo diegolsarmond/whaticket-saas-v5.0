@@ -142,19 +142,27 @@ const Connections = () => {
 	};
 
 	const handleOpenWhatsAppModal = () => {
-		setSelectedWhatsApp(null);
-		setWhatsAppModalOpen(true);
-	};
+	if (document.activeElement instanceof HTMLElement) {
+		document.activeElement.blur();
+	}
+	setSelectedWhatsApp(null);
+	setWhatsAppModalOpen(true);
+};
+
+
 
 	const handleCloseWhatsAppModal = useCallback(() => {
 		setWhatsAppModalOpen(false);
 		setSelectedWhatsApp(null);
 	}, [setSelectedWhatsApp, setWhatsAppModalOpen]);
 
-	const handleOpenQrModal = whatsApp => {
-		setSelectedWhatsApp(whatsApp);
-		setQrModalOpen(true);
-	};
+        const handleOpenQrModal = whatsApp => {
+                if (document.activeElement) {
+                        document.activeElement.blur();
+                }
+                setSelectedWhatsApp(whatsApp);
+                setQrModalOpen(true);
+        };
 
 	const handleCloseQrModal = useCallback(() => {
 		setSelectedWhatsApp(null);
