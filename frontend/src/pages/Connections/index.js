@@ -142,9 +142,14 @@ const Connections = () => {
 	};
 
 	const handleOpenWhatsAppModal = () => {
-		setSelectedWhatsApp(null);
-		setWhatsAppModalOpen(true);
-	};
+	if (document.activeElement instanceof HTMLElement) {
+		document.activeElement.blur();
+	}
+	setSelectedWhatsApp(null);
+	setWhatsAppModalOpen(true);
+};
+
+
 
 	const handleCloseWhatsAppModal = useCallback(() => {
 		setWhatsAppModalOpen(false);
