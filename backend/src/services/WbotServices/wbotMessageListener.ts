@@ -32,6 +32,7 @@ import {
 import moment from "moment";
 //import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
 import OpenAI from "openai";
+import type { OpenAI as OpenAIClient } from "openai";
 import { Op } from "sequelize";
 import { debounce } from "../../helpers/Debounce";
 import formatBody from "../../helpers/Mustache";
@@ -74,7 +75,7 @@ type Session = WASocket & {
   store?: Store;
 };
 
-interface SessionOpenAi extends OpenAI {
+interface SessionOpenAi extends OpenAIClient {
   id?: number;
 }
 const sessionsOpenAi: SessionOpenAi[] = [];
@@ -661,6 +662,9 @@ const deleteFileSync = (path: string): void => {
 const keepOnlySpecifiedChars = (str: string) => {
   return str.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚâêîôûÂÊÎÔÛãõÃÕçÇ!?.,;:\s]/g, "");
 };
+
+const openai = new OpenAI({ apiKey: prompt.apiKey });
+
 const handleOpenAi = async (
   msg: proto.IWebMessageInfo,
   wbot: Session,
@@ -684,7 +688,7 @@ const handleOpenAi = async (
 
   const publicFolder: string = path.resolve(__dirname, "..", "..", "..", "public");
 
-  let openai: OpenAI | any;
+  let openai: OpenAIClient | any;
   const openAiIndex = sessionsOpenAi.findIndex(s => s.id === ticket.id);
 
   if (openAiIndex === -1) {
@@ -2411,15 +2415,16 @@ const verifyCampaignMessageAndCloseTicket = async (
 const filterMessages = (msg: WAMessage): boolean => {
   if (msg.message?.protocolMessage) return false;
 
-  if (
-    [
-      WAMessageStubType.REVOKE,
-      WAMessageStubType.E2E_DEVICE_CHANGED,
-      WAMessageStubType.E2E_IDENTITY_CHANGED,
-      WAMessageStubType.CIPHERTEXT
-    ].includes(msg.messageStubType as WAMessageStubType)
-  )
-    return false;
+if (
+  [
+    WAMessageStubType.REVOKE,
+    WAMessageStubType.E2E_DEVICE_CHANGED,
+    WAMessageStubType.E2E_IDENTITY_CHANGED,
+    WAMessageStubType.CIPHERTEXT
+  ].includes(msg.messageStubType)
+)
+  return false;
+
 
   return true;
 };
