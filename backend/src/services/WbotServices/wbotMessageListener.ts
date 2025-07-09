@@ -32,7 +32,7 @@ import {
 import moment from "moment";
 //import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
 import OpenAI from "openai";
-import type { OpenAI as OpenAIClient } from "openai";
+type OpenAIClient = OpenAI;
 import { Op } from "sequelize";
 import { debounce } from "../../helpers/Debounce";
 import formatBody from "../../helpers/Mustache";
@@ -75,9 +75,9 @@ type Session = WASocket & {
   store?: Store;
 };
 
-interface SessionOpenAi extends OpenAIClient {
+type SessionOpenAi = OpenAIClient & {
   id?: number;
-}
+};
 const sessionsOpenAi: SessionOpenAi[] = [];
 
 interface ImessageUpsert {
@@ -663,7 +663,6 @@ const keepOnlySpecifiedChars = (str: string) => {
   return str.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚâêîôûÂÊÎÔÛãõÃÕçÇ!?.,;:\s]/g, "");
 };
 
-const openai = new OpenAI({ apiKey: prompt.apiKey });
 
 const handleOpenAi = async (
   msg: proto.IWebMessageInfo,
