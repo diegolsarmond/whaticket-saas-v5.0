@@ -151,10 +151,13 @@ const Connections = () => {
 		setSelectedWhatsApp(null);
 	}, [setSelectedWhatsApp, setWhatsAppModalOpen]);
 
-	const handleOpenQrModal = whatsApp => {
-		setSelectedWhatsApp(whatsApp);
-		setQrModalOpen(true);
-	};
+        const handleOpenQrModal = whatsApp => {
+                if (document.activeElement) {
+                        document.activeElement.blur();
+                }
+                setSelectedWhatsApp(whatsApp);
+                setQrModalOpen(true);
+        };
 
 	const handleCloseQrModal = useCallback(() => {
 		setSelectedWhatsApp(null);
