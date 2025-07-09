@@ -10,6 +10,10 @@ import makeWASocket, {
   jidNormalizedUser,
   CacheStore
 } from "@whiskeysockets/baileys";
+<<<<<<< HEAD
+=======
+import { makeInMemoryStore } from "@whiskeysockets/baileys";
+>>>>>>> 27d5c3a1831e6c0c376c2ff45025f2a337cb15da
 import { Op } from "sequelize";
 import { FindOptions } from "sequelize/types";
 import Whatsapp from "../models/Whatsapp";

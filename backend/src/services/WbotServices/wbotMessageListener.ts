@@ -31,6 +31,10 @@ import {
 import moment from "moment";
 //import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
 import OpenAI from "openai";
+<<<<<<< HEAD
+=======
+type OpenAIClient = OpenAI;
+>>>>>>> 27d5c3a1831e6c0c376c2ff45025f2a337cb15da
 import { Op } from "sequelize";
 import { debounce } from "../../helpers/Debounce";
 import formatBody from "../../helpers/Mustache";
@@ -72,9 +76,13 @@ type Session = WASocket & {
   store?: Store;
 };
 
+<<<<<<< HEAD
 interface SessionOpenAi extends OpenAI {
+=======
+type SessionOpenAi = OpenAIClient & {
+>>>>>>> 27d5c3a1831e6c0c376c2ff45025f2a337cb15da
   id?: number;
-}
+};
 const sessionsOpenAi: SessionOpenAi[] = [];
 
 interface ImessageUpsert {
@@ -655,6 +663,11 @@ const deleteFileSync = (path: string): void => {
 const keepOnlySpecifiedChars = (str: string) => {
   return str.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚâêîôûÂÊÎÔÛãõÃÕçÇ!?.,;:\s]/g, "");
 };
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 27d5c3a1831e6c0c376c2ff45025f2a337cb15da
 const handleOpenAi = async (
   msg: proto.IWebMessageInfo,
   wbot: Session,

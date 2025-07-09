@@ -46,7 +46,11 @@
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.2",
     "nodemailer": "^6.8.0",
+<<<<<<< HEAD
     "openai": "^4.24.7",
+=======
+    "openai": "^4.0.0",
+>>>>>>> 27d5c3a1831e6c0c376c2ff45025f2a337cb15da
     "pg": "^8.7.3",
     "pino": "^7.8.0",
     "pino-pretty": "^10.0.0",
