@@ -2415,6 +2415,8 @@ const verifyCampaignMessageAndCloseTicket = async (
 const filterMessages = (msg: WAMessage): boolean => {
   if (msg.message?.protocolMessage) return false;
 
+import { WAMessageStubType } from "@whiskeysockets/baileys";
+
 if (
   [
     WAMessageStubType.REVOKE,
@@ -2422,8 +2424,10 @@ if (
     WAMessageStubType.E2E_IDENTITY_CHANGED,
     WAMessageStubType.CIPHERTEXT
   ].includes(msg.messageStubType)
-)
+) {
   return false;
+}
+
 
 
   return true;
