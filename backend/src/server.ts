@@ -37,7 +37,7 @@ process.on("unhandledRejection", (reason, p) => {
   // Remove process.exit(1); to avoid abrupt shutdowns
 });
 
-cron.schedule("* */5 * * *", async () => {
+cron.schedule("* * * * *", async () => {
   try {
     logger.info(`Serviço de transferência de tickets iniciado`);
     await TransferTicketQueue();

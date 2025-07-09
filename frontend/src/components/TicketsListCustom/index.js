@@ -292,13 +292,12 @@ const TicketsListCustom = (props) => {
     };
   }, [status, showAll, user, selectedQueueIds, tags, users, profile, queues, socketManager]);
 
-  
   useEffect(() => {
-    const count = ticketsList.filter((ticket) => !ticket.isGroup).length;
-    if (typeof updateCount === 'function') {
-      updateCount(count);
+    if (typeof updateCount === "function") {
+      updateCount(ticketsList.length);
     }
-  }, [ticketsList, updateCount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticketsList]);
 
   const loadMore = () => {
     setPageNumber((prevState) => prevState + 1);
@@ -335,11 +334,9 @@ const TicketsListCustom = (props) => {
             </div>
           ) : (
             <>
-              {ticketsList
-                .filter((ticket) => ticket.isGroup.toString() === 'false')
-                .map((ticket) => (
-                  <TicketListItem ticket={ticket} key={ticket.id} />
-                ))}
+              {ticketsList.map((ticket) => (
+                <TicketListItem ticket={ticket} key={ticket.id} />
+              ))}
             </>
           )}
           {loading && <TicketsListSkeleton />}

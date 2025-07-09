@@ -1,33 +1,49 @@
-import React, { useContext, useEffect } from "react";
-import { Checkbox } from "@mui/material";
+import React, { useContext } from "react";
+import toastError from "../../errors/toastError";
+import { Checkbox } from "@material-ui/core";
 import { ForwardMessageContext } from "../../context/ForwarMessage/ForwardMessageContext";
 
 const SelectMessageCheckbox = ({ message }) => {
-    const { showSelectMessageCheckbox, selectedMessages, setSelectedMessages, resetSelection } = useContext(ForwardMessageContext);
+    const [isChecked, setIsChecked] = React.useState(false);
+    const { 
+        showSelectMessageCheckbox,
+        setSelectedMessages,
+        selectedMessages,
+    } = useContext(ForwardMessageContext);
 
-    // Verifica se a mensagem está na lista de selecionadas
-    const isChecked = selectedMessages.some((m) => m.id === message.id);
+    const handleSelectMessage = (e, message) => {
+        let updatedList = [...selectedMessages];
 
-    const handleSelectMessage = (e) => {
-        const updatedList = e.target.checked
-            ? [...selectedMessages, message]  // Adiciona mensagem se marcada
-            : selectedMessages.filter((m) => m.id !== message.id);  // Remove mensagem se desmarcada
+        if (e.target.checked) {
+            setIsChecked(true);
+            updatedList.push(message);
+        } else {
+            const index = updatedList.findIndex((m) => m.id === message.id);
+            if (index !== -1) {
+                updatedList.splice(index, 1);
+            }
+            setIsChecked(false);
+        }
 
         setSelectedMessages(updatedList);
     };
 
-    // Reseta o checkbox quando o resetSelection é chamado
-    useEffect(() => {
-        if (!showSelectMessageCheckbox) {
-            setSelectedMessages([]);  // Limpa a seleção se o checkbox for ocultado
-        }
-    }, [showSelectMessageCheckbox, setSelectedMessages]);
+    React.useEffect(() => {
+        const isMessageSelected = selectedMessages.some((m) => m.id === message.id);
+        setIsChecked(isMessageSelected);
+    }, [selectedMessages, message]);
 
-    if (!showSelectMessageCheckbox) {
+    if (showSelectMessageCheckbox) {
+        return (
+            <Checkbox 
+                color="primary" 
+                checked={isChecked} 
+                onChange={(e) => handleSelectMessage(e, message)} 
+            />
+        );
+    } else {
         return null;
     }
-
-    return <Checkbox color="primary" checked={isChecked} onChange={handleSelectMessage} />;
 };
 
 export default SelectMessageCheckbox;

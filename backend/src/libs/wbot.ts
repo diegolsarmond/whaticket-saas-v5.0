@@ -5,11 +5,11 @@ import makeWASocket, {
   DisconnectReason,
   fetchLatestBaileysVersion,
   makeCacheableSignalKeyStore,
+  makeInMemoryStore,
   isJidBroadcast,
   jidNormalizedUser,
   CacheStore
 } from "@whiskeysockets/baileys";
-import makeInMemoryStore from "@whiskeysockets/baileys/lib/Store";
 import { Op } from "sequelize";
 import { FindOptions } from "sequelize/types";
 import Whatsapp from "../models/Whatsapp";
@@ -25,7 +25,6 @@ import DeleteBaileysService from "../services/BaileysServices/DeleteBaileysServi
 import NodeCache from 'node-cache';
 import Contact from "../models/Contact";
 import Ticket from "../models/Ticket";
-import * as StoreModule from "@whiskeysockets/baileys/lib/Store";
 const loggerBaileys = MAIN_LOGGER.child({});
 loggerBaileys.level = "error";
 
@@ -33,9 +32,6 @@ type Session = WASocket & {
   id?: number;
   store?: Store;
 };
-
-
-const makeInMemoryStore = StoreModule.default;
 
 const sessions: Session[] = [];
 
@@ -132,7 +128,7 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
           logger: loggerBaileys,
           printQRInTerminal: false,
           browser: [
-            process.env.BROWSER_CLIENT || "PackTypebot",
+            process.env.BROWSER_CLIENT || "Whaticket",
             process.env.BROWSER_NAME || "Chrome",
             process.env.BROWSER_VERSION || "10.0"
           ],

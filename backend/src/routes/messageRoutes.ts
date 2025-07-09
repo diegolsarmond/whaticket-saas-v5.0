@@ -18,5 +18,4 @@ messageRoutes.post("/messages/edit/:messageId", isAuth, MessageController.edit);
 messageRoutes.post('/message/forward', isAuth, MessageController.forwardMessage)
 messageRoutes.post('/messages/:messageId/reactions', isAuth, MessageController.addReaction);
 
-
 export default messageRoutes;

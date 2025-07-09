@@ -48,7 +48,7 @@ const QrcodeModal = ({ open, onClose, whatsAppId }) => {
   }, [whatsAppId, onClose, socketManager]);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" scroll="paper" disableEnforceFocus>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" scroll="paper">
       <DialogContent>
         <Paper elevation={0} style={{ display: "flex", alignItems: "center" }}>
           <div style={{ marginRight: "20px" }}>
